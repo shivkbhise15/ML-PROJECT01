@@ -42,7 +42,7 @@ const Home = () => {
   return (
     <div className="home-wrapper">
     <div className="app-container">
-      <h1>Traffic AI Dashboard</h1>
+      <h1>TRAFFIC CONGESTION PREDICTING SYSTEM</h1>
       <p>Predict Traffic Levels Based on Input Conditions</p>
 
       <div className="dashboard-content">
