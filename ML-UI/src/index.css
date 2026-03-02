@@ -6,92 +6,197 @@
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
-.home-wrapper {
-  min-height: calc(100vh - 70px); /* adjust if navbar height differs */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+
 body {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-  margin: 0;
-  
-  
+  /* background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); */
+  background: #0f172a;
+  /* slate-900 */
 }
+
+/* Page Wrapper */
+.home-wrapper {
+  min-height: calc(100vh - 70px);
+  padding: 40px 20px;
+}
+
+/* Main Container */
 .app-container {
-  width: 50%;
-  max-width: 1000px;
-  padding: 40px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
-  justify-content: center;   
-  margin: 40px auto;
-  min-height: 60vh;
+  max-width: 1400px;
+  margin: auto;
 }
-.predict-form-body input{
-  color: black;
-}
+
 .dashboard-content {
   display: flex;
   gap: 30px;
-  margin-top: 20px;
+  align-items: stretch;
 }
-.predict-form-body {
+
+/* Map Section */
+.map-section {
+  flex: 2;
+  min-height: 600px;
+}
+
+/* Make map look premium */
+.leaflet-container {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Form Section */
+.form-section {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  /* 30% approx */
+  background: #1e293b;
+  /* slate-800 */
+  color: white;
+  backdrop-filter: blur(12px);
+  padding: 25px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+}
+
+/* Form Layout */
+.predict-form-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 15px;
 }
 
-.predict-form-body input {
+.predict-form-body input,
+.predict-form-body select {
   padding: 10px;
   border-radius: 8px;
   border: none;
   outline: none;
+  background: #0f172a;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.timeline-section {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+}
+
+.timeline-section input {
+  width: 100%;
+}
+
+.result-bar {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+.result-item strong {
+  font-size: 22px;
 }
 
 .predict-form-body button {
-  padding: 10px;
-  border-radius: 8px;
+  grid-column: span 2;
+  padding: 12px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
   background: #00c6ff;
   color: white;
   font-weight: 600;
-  transition: 0.2s ease;
+  transition: 0.3s ease;
 }
 
 .predict-form-body button:hover {
   opacity: 0.85;
+  transform: translateY(-2px);
 }
-.result-card {
-  flex: 1;
-  padding: 20px;
-  border-radius: 15px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(10px);
-}
+
+/* Loader */
 .loader {
   width: 40px;
   height: 40px;
-  border: 5px solid rgba(255,255,255,0.2);
+  border: 5px solid rgba(255, 255, 255, 0.2);
   border-top: 5px solid #00c6ff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 20px auto;
 }
 
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+button:disabled::after {
+  content: "...";
+  animation: blink 1s infinite;
+}
+
+.full-width-section {
+  grid-column: 1 / -1;
+}
+
+.manual-history-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  width: 100%;
+  grid-column: 1 / -1;   /* 🔥 This is the key if you're using grid */
+}
+
+
+.manual-history-section input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.6);
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.manual-history-section input:focus {
+  border: 1px solid #22d3ee;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
+}
+.manual-history-section {
+  animation: fadeSlide 0.3s ease forwards;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
