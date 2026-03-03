@@ -209,7 +209,7 @@ def navigate(data: RouteInput):
 import requests
 from fastapi import APIRouter
 
-ORS_API_KEY ="eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImIyYzAzNzU4ZjcxOTQwOWE4MzQ1Yjk2NDgzMDQ1NmM3IiwiaCI6Im11cm11cjY0In0="
+ORS_API_KEY =os.environ.get("ORS_API_KEY")
 
 @app.get("/route")
 def get_signal_routes():
