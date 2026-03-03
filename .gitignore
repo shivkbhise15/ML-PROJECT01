@@ -21,7 +21,8 @@ env/
 
 #env
 .env
-# ML models
+
+# ML model files
 ML-Backend/models/
 *.pkl
 

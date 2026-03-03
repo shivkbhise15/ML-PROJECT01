@@ -209,7 +209,7 @@ def navigate(data: RouteInput):
 import requests
 from fastapi import APIRouter
 
-ORS_API_KEY =os.getenv("eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImIyYzAzNzU4ZjcxOTQwOWE4MzQ1Yjk2NDgzMDQ1NmM3IiwiaCI6Im11cm11cjY0In0=")
+ORS_API_KEY ="eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImIyYzAzNzU4ZjcxOTQwOWE4MzQ1Yjk2NDgzMDQ1NmM3IiwiaCI6Im11cm11cjY0In0="
 
 @app.get("/route")
 def get_signal_routes():
@@ -307,3 +307,134 @@ def predict_directions(data: TrafficInput):
     print("Directional results:", results)
 
     return results
+
+# Add this model alongside your existing ones
+class NavigatePredictInput(BaseModel):
+    start_lat: float
+    start_lng: float
+    end_lat: float
+    end_lng: float
+    date_time: str
+    holiday: str
+    temp: float
+    rain_1h: float
+    snow_1h: float
+    clouds_all: float
+
+
+@app.post("/navigate-predict")
+def navigate_predict(data: NavigatePredictInput):
+    # Step 1: Fetch route geometry from OSRM
+    osrm_url = (
+        f"https://router.project-osrm.org/route/v1/driving/"
+        f"{data.start_lng},{data.start_lat};"
+        f"{data.end_lng},{data.end_lat}"
+        f"?overview=full&geometries=geojson"
+    )
+
+    try:
+        response = requests.get(osrm_url, timeout=10)
+        route_data = response.json()
+    except Exception as e:
+        return {"error": f"OSRM request failed: {str(e)}"}
+
+    if "routes" not in route_data or len(route_data["routes"]) == 0:
+        return {"error": "Route not found between those locations"}
+
+    route = route_data["routes"][0]
+    raw_coords = route["geometry"]["coordinates"]   # OSRM returns [lng, lat]
+    distance_m = route["legs"][0]["distance"]
+    duration_s = route["legs"][0]["duration"]
+
+    # Flip to [lat, lng] for Leaflet Polyline
+    leaflet_coords = [[c[1], c[0]] for c in raw_coords]
+
+    # Step 2: Run traffic prediction using existing logic
+    traffic_input = TrafficInput(
+        date_time=data.date_time,
+        holiday=data.holiday,
+        temp=data.temp,
+        rain_1h=data.rain_1h,
+        snow_1h=data.snow_1h,
+        clouds_all=data.clouds_all
+    )
+
+    prediction_value = predict_traffic_logic(traffic_input)
+
+    if prediction_value < 1500:
+        level = "Low"
+        color = "#16a34a"
+    elif prediction_value < 3000:
+        level = "Medium"
+        color = "#ff9f0a"
+    else:
+        level = "High"
+        color = "#ff3b30"
+
+    return {
+        "route_coordinates": leaflet_coords,
+        "start_point": [data.start_lat, data.start_lng],
+        "end_point": [data.end_lat, data.end_lng],
+        "distance_km": round(distance_m / 1000, 2),
+        "duration_min": round(duration_s / 60, 1),
+        "predicted_traffic_volume": round(prediction_value, 2),
+        "traffic_level": level,
+        "color": color
+    }
+
+@app.get("/analytics/hourly")
+def hourly_analytics():
+    hourly = (
+        historical_df
+        .groupby(historical_df.index.hour)["traffic_volume"]
+        .agg(["mean", "max", "min"])
+        .reset_index()
+    )
+    hourly.columns = ["hour", "mean", "max", "min"]
+    hourly["hour_label"] = hourly["hour"].apply(
+        lambda h: f"{h:02d}:00"
+    )
+    return hourly.round(1).to_dict(orient="records")
+
+
+@app.get("/analytics/weekly")
+def weekly_analytics():
+    days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    weekly = (
+        historical_df
+        .groupby(historical_df.index.dayofweek)["traffic_volume"]
+        .mean()
+        .reset_index()
+    )
+    weekly.columns = ["day_index", "mean"]
+    weekly["day"] = weekly["day_index"].apply(lambda x: days[x])
+    return weekly.round(1).to_dict(orient="records")
+
+
+@app.get("/analytics/distribution")
+def traffic_distribution():
+    df = historical_df
+    low    = int((df["traffic_volume"] < 1500).sum())
+    medium = int(((df["traffic_volume"] >= 1500) & (df["traffic_volume"] < 3000)).sum())
+    high   = int((df["traffic_volume"] >= 3000).sum())
+    total  = low + medium + high
+    return [
+        {"level": "Low",    "count": low,    "color": "#10b981", "pct": round(low/total*100,1)},
+        {"level": "Medium", "count": medium, "color": "#ff9f0a", "pct": round(medium/total*100,1)},
+        {"level": "High",   "count": high,   "color": "#f43f5e", "pct": round(high/total*100,1)},
+    ]
+
+
+@app.get("/analytics/stats")
+def dataset_stats():
+    df = historical_df
+    return {
+        "total_records":    len(df),
+        "mean_volume":      round(float(df["traffic_volume"].mean()), 1),
+        "max_volume":       round(float(df["traffic_volume"].max()), 1),
+        "min_volume":       round(float(df["traffic_volume"].min()), 1),
+        "peak_hour":        int(df.groupby(df.index.hour)["traffic_volume"].mean().idxmax()),
+        "quiet_hour":       int(df.groupby(df.index.hour)["traffic_volume"].mean().idxmin()),
+        "date_start":       str(df.index.min().date()),
+        "date_end":         str(df.index.max().date()),
+    }
