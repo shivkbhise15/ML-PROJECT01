@@ -5,16 +5,14 @@ import "leaflet/dist/leaflet.css";
 const TrafficMap = ({ predictionInput, loading, navRoute }) => {
   const [routeCoords, setRouteCoords] = useState([]);
   const [directionData, setDirectionData] = useState(null);
-  const mapRef = useRef(null);   // ✅ Safe alternative to useMap
+  const mapRef = useRef(null);   
 
-  // Auto-fit map when navRoute changes — using ref, NOT useMap hook
   useEffect(() => {
     if (navRoute && mapRef.current && navRoute.route_coordinates?.length > 0) {
       mapRef.current.fitBounds(navRoute.route_coordinates, { padding: [50, 50] });
     }
   }, [navRoute]);
 
-  // Fetch directional routes on mount
   useEffect(() => {
     const fetchRoute = async () => {
       try {
@@ -29,7 +27,7 @@ const TrafficMap = ({ predictionInput, loading, navRoute }) => {
     fetchRoute();
   }, []);
 
-  // Fetch directional predictions when form is submitted
+  
   useEffect(() => {
     if (!predictionInput) return;
 

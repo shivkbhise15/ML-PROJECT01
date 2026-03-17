@@ -9,18 +9,18 @@ const Navbar = () => {
           <span className="brand-name">
             Traffic<span className="brand-accent">AI</span>
           </span>
-          <span className="brand-sub">Congestion Intelligence</span>
+          <span className="brand-sub">Congestion Prediction System</span>
         </div>
       </div>
 
       <div className="navbar-center">
-        <NavLink to="/"          className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+        <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
           Dashboard
         </NavLink>
         <NavLink to="/analytics" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
           Analytics
         </NavLink>
-        <NavLink to="/reports"   className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+        <NavLink to="/reports" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
           Reports
         </NavLink>
       </div>

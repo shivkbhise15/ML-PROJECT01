@@ -389,9 +389,7 @@ body::after {
 }
 
 
-/* ═══════════════════════════
-   FORM SECTION
-═══════════════════════════ */
+
 .form-section {
   flex: 1;
   min-width: 330px;

@@ -20,6 +20,7 @@ const ResultBar = ({ prediction, isSliderActive, sliderLoading, sliderHour }) =>
         <span>Traffic Volume</span>
         <strong style={{ color: "#f1f5f9" }}>
           {prediction.predicted_traffic_volume.toFixed(0)}
+          
           <small style={{ fontSize: 12, fontWeight: 400, color: "#64748b", marginLeft: 4 }}>
             v/hr
           </small>
